@@ -1241,7 +1241,7 @@ enum class HoloLensOperatorID : uint8_t {
 
 /**
 * Message type for communicatong the pose (position + orientation)
-* and eye gaze ray of a (human) operator in the MR scene.
+* and eye gaze data of a (human) operator in the MR scene.
 */
 struct OperatorPoseMessage {
 
@@ -1256,7 +1256,9 @@ struct OperatorPoseMessage {
         HoloLensOperatorID   operator_id;
         std::array<float, 3> position; // 3d position (x,y,z)
         std::array<float, 4> orientation; // orientation given as quaternion (x,y,z,w)
-        std::array<float, 3> gaze_ray; // additional directional vector for eye gaze (x,y,z)
+        std::array<float, 3> gaze_position; // eye gaze position (x,y,z)
+        std::array<float, 4> gaze_orientation; // eye gaze orientation as quaternion (x,y,z,w)
+        int64_t              gaze_time; // eye gaze sample time
     };
 };
 

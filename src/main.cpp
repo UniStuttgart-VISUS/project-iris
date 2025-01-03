@@ -484,7 +484,7 @@ struct OperatorPoseServer
             ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_ScrollX;
 
         //if (ImGui::Begin("Received data")) {
-        int columm_cnt = 10;/* number of floats in each OperatorPoseMessage */
+        int columm_cnt = 15;/* number of floats in each OperatorPoseMessage */
         if (ImGui::BeginTable("Operator pose", columm_cnt, flags))
         {
             ImGui::TableSetupColumn("Position x");
@@ -494,9 +494,14 @@ struct OperatorPoseServer
             ImGui::TableSetupColumn("Orientation y");
             ImGui::TableSetupColumn("Orientation z");
             ImGui::TableSetupColumn("Orientation w");
-            ImGui::TableSetupColumn("Gaze x");
-            ImGui::TableSetupColumn("Gaze y");
-            ImGui::TableSetupColumn("Gaze z");
+            ImGui::TableSetupColumn("Gaze Pos. x");
+            ImGui::TableSetupColumn("Gaze Pos. y");
+            ImGui::TableSetupColumn("Gaze Pos. z");
+            ImGui::TableSetupColumn("Gaze Ori. x");
+            ImGui::TableSetupColumn("Gaze Ori. y");
+            ImGui::TableSetupColumn("Gaze Ori. z");
+            ImGui::TableSetupColumn("Gaze Ori. w");
+            ImGui::TableSetupColumn("Sample Time");
 
             ImGui::TableHeadersRow();
 
@@ -508,7 +513,7 @@ struct OperatorPoseServer
                         ImGui::TableNextRow();
                         auto& row_data = data[row];
 
-                        for (int col = 0; col < 10; ++col) {
+                        for (int col = 0; col < columm_cnt; ++col) {
                             if (row == current_data_row_) {
                                 ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ImGui::GetColorU32(TheiaColorPalette::orange()), col);
                             }
@@ -537,11 +542,23 @@ struct OperatorPoseServer
                         ImGui::Text("%04.4f", row_data.orientation[3]);
 
                         ImGui::TableSetColumnIndex(7);
-                        ImGui::Text("%04.4f", row_data.gaze_ray[0]);
+                        ImGui::Text("%04.4f", row_data.gaze_position[0]);
                         ImGui::TableSetColumnIndex(8);
-                        ImGui::Text("%04.4f", row_data.gaze_ray[1]);
+                        ImGui::Text("%04.4f", row_data.gaze_position[1]);
                         ImGui::TableSetColumnIndex(9);
-                        ImGui::Text("%04.4f", row_data.gaze_ray[2]);
+                        ImGui::Text("%04.4f", row_data.gaze_position[2]);
+
+                        ImGui::TableSetColumnIndex(10);
+                        ImGui::Text("%04.4f", row_data.gaze_orientation[0]);
+                        ImGui::TableSetColumnIndex(11);
+                        ImGui::Text("%04.4f", row_data.gaze_orientation[1]);
+                        ImGui::TableSetColumnIndex(12);
+                        ImGui::Text("%04.4f", row_data.gaze_orientation[2]);
+                        ImGui::TableSetColumnIndex(13);
+                        ImGui::Text("%04.4f", row_data.gaze_orientation[3]);
+
+                        ImGui::TableSetColumnIndex(14);
+                        ImGui::Text("%04.4f", row_data.gaze_time);
                     }
                 }
             }
@@ -568,9 +585,14 @@ struct OperatorPoseServer
                     received_data_[row].orientation[1],
                     received_data_[row].orientation[2],
                     received_data_[row].orientation[3],
-                    received_data_[row].gaze_ray[0],
-                    received_data_[row].gaze_ray[1],
-                    received_data_[row].gaze_ray[2]
+                    received_data_[row].gaze_position[0],
+                    received_data_[row].gaze_position[1],
+                    received_data_[row].gaze_position[2],
+                    received_data_[row].gaze_orientation[0],
+                    received_data_[row].gaze_orientation[1],
+                    received_data_[row].gaze_orientation[2],
+                    received_data_[row].gaze_orientation[3],
+                    (float)received_data_[row].gaze_time
             });
             //write_buffer.push_back(std::vector<float>(10));
             //std::memcpy(write_buffer[row].data(), &received_data_[row], sizeof(OperatorPoseMessage::RawData));
@@ -600,7 +622,9 @@ struct OperatorPoseServer
                 local_data_[row].operator_id = static_cast<HoloLensOperatorID>(load_buffer[row].data()[0]);
                 local_data_[row].position = { load_buffer[row].data()[1],load_buffer[row].data()[2],load_buffer[row].data()[3] };
                 local_data_[row].orientation = { load_buffer[row].data()[4],load_buffer[row].data()[5],load_buffer[row].data()[6], load_buffer[row].data()[7] };
-                local_data_[row].gaze_ray = { load_buffer[row].data()[8],load_buffer[row].data()[9],load_buffer[row].data()[10] };
+                local_data_[row].gaze_position = { load_buffer[row].data()[8],load_buffer[row].data()[9],load_buffer[row].data()[10] };
+                local_data_[row].gaze_orientation = { load_buffer[row].data()[11],load_buffer[row].data()[12],load_buffer[row].data()[13], load_buffer[row].data()[14] };
+                local_data_[row].gaze_time = load_buffer[row].data()[15];
                 //std::memcpy(&local_data_[row], load_buffer[row].data(), load_buffer[row].size() * sizeof(float));
             }
         }
